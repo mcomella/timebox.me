@@ -10,7 +10,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
-private val DEBUG_TIME_OVERRIDE_SECONDS: Long? = 1L
+private val DEBUG_TIME_OVERRIDE_SECONDS: Long? = null
 
 private const val DELAY_BETWEEN_NOTIFICATIONS_SECONDS = 15L
 
@@ -62,7 +62,6 @@ private fun onUpdate(totalDurationMins: Long, update: CountdownTimer.Update) {
 
         while (true) { // We expect the user to kill the app with ^-c.
             notifications.send("Timebox.me complete", "Slept $totalDurationMins minutes.")
-            println("notification sent")
             Thread.sleep(TimeUnit.SECONDS.toMillis(DELAY_BETWEEN_NOTIFICATIONS_SECONDS))
         }
     }

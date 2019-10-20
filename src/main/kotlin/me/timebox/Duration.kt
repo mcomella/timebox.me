@@ -14,7 +14,7 @@ class Duration(val millis: Long) {
         val remainingSeconds = millis - minutesAsMillis
         val seconds = remainingSeconds / 1000
 
-        val minutesStr = "0$minutes".takeLast(3)
+        val minutesStr = "0$minutes".takeLast(2)
         val secondsStr = "0$seconds".takeLast(2)
 
         return "$minutesStr:$secondsStr"
