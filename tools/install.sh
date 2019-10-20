@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Installs the app: this will overwrite any files at the destination.
+
 set -e # exit on error.
 
 # These are absolute paths.
