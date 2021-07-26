@@ -22,24 +22,43 @@ private val notifications = JvmNotifications()
 // - custom messages (i.e. reasons for sleeping & passed to notifications
 // - notification sounds (Linux or DnD macOS)
 fun main(args: Array<String>) {
-    if (args.size != 1) {
+    val (timerMinutes, isFiveMinuteWarningEnabled) = parseArgs(args)
+    println("Started at ${dateFormat.format(Date())}")
+
+    val finalTimerMillis = minutesToMillisWithOverride(timerMinutes)
+    val finalTimer = newCountdownTimer(finalTimerMillis).apply {
+        addUpdateListener { onUpdate(timerMinutes, it) }
+    }
+    finalTimer.play()
+
+    if (isFiveMinuteWarningEnabled && timerMinutes >= 6) {
+        val fiveMinuteWarningTimerMillis = minutesToMillisWithOverride(timerMinutes - 5)
+        val fiveMinuteWarningTimer = newCountdownTimer(fiveMinuteWarningTimerMillis).apply {
+            addUpdateListener { onFiveMinuteWarningUpdate(it) }
+        }
+
+        fiveMinuteWarningTimer.play()
+    }
+}
+
+private fun parseArgs(args: Array<String>): Pair<Long, Boolean> {
+    if (args.isEmpty() || args.size > 2) {
         printUsage()
         exitProcess(1)
     }
 
-    println("Started at ${dateFormat.format(Date())}")
-
-    val timerMinutes: Long = args[0].toLong()
-    val timerMillis = minutesToMillisWithOverride(timerMinutes)
-    val timer = newCountdownTimer(timerMillis).apply {
-        addUpdateListener { onUpdate(timerMinutes, it) }
+    val isNoWarning = if (args.size != 2) {
+        false
+    } else {
+        check(args[1] == "--no-warning")
+        true
     }
 
-    timer.play()
+    return Pair(args[0].toLong(), !isNoWarning)
 }
 
 private fun printUsage() {
-    println("usage: timebox <minutes>")
+    println("usage: timebox <minutes> [--no-warning]")
 }
 
 private fun minutesToMillisWithOverride(timerMinutes: Long): Long {
@@ -67,6 +86,12 @@ private fun onUpdate(totalDurationMins: Long, update: CountdownTimer.Update) {
     }
 
     print("  ${update.durationRemaining} remaining")
+}
+
+fun onFiveMinuteWarningUpdate(update: CountdownTimer.Update) {
+    if (update.state == CountdownTimer.State.COMPLETED) {
+        notifications.send("Timebox.me", "Five minute warning")
+    }
 }
 
 private fun newCountdownTimer(totalDurationMillis: Long) = CountdownTimer(

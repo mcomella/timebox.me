@@ -31,7 +31,7 @@ class JvmNotifications {
 
     private fun sendMac(title: String, bodyText: String) {
         // TODO: test.
-        val cmd = arrayOf("osascript", "-e", "display notification \"$bodyText\" with title \"$title\"")
+        val cmd = arrayOf("osascript", "-e", "display notification \"$bodyText\" with title \"$title\" sound name \"Submarine\"")
         runtime.exec(cmd).waitAndThrowOnNonZero()
     }
 
