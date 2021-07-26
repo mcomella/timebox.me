@@ -22,7 +22,7 @@ private val notifications = JvmNotifications()
 // - custom messages (i.e. reasons for sleeping & passed to notifications
 // - notification sounds (Linux or DnD macOS)
 fun main(args: Array<String>) {
-    val (timerMinutes, isFiveMinuteWarningEnabled) = parseArgs(args)
+    val (timerMinutes, isWarningEnabled) = parseArgs(args)
     println("Started at ${dateFormat.format(Date())}")
 
     val finalTimerMillis = minutesToMillisWithOverride(timerMinutes)
@@ -31,13 +31,14 @@ fun main(args: Array<String>) {
     }
     finalTimer.play()
 
-    if (isFiveMinuteWarningEnabled && timerMinutes >= 6) {
-        val fiveMinuteWarningTimerMillis = minutesToMillisWithOverride(timerMinutes - 5)
-        val fiveMinuteWarningTimer = newCountdownTimer(fiveMinuteWarningTimerMillis).apply {
+    if (isWarningEnabled && timerMinutes > 2) {
+        val warningTimeMinutes = if (timerMinutes < 10) 2 else 5
+        val warningTimerMillis = minutesToMillisWithOverride(timerMinutes - warningTimeMinutes)
+        val warningTimer = newCountdownTimer(warningTimerMillis).apply {
             addUpdateListener { onFiveMinuteWarningUpdate(it) }
         }
 
-        fiveMinuteWarningTimer.play()
+        warningTimer.play()
     }
 }
 
